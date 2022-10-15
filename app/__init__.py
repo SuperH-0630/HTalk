@@ -5,6 +5,11 @@ import logging.handlers
 import os
 import sys
 
+from .db import db
+from .moment import moment
+from .mail import mail
+from .migrate import migrate
+
 from configure import conf
 
 
@@ -19,11 +24,14 @@ class HTalkFlask(Flask):
         self.profile_setting()
         self.logging_setting()
 
+        db.init_app(self)
+        moment.init_app(self)
+        mail.init_app(self)
+        migrate.init_app(self)
 
     def profile_setting(self):
         if conf["DEBUG_PROFILE"]:
             self.wsgi_app = ProfilerMiddleware(self.wsgi_app, sort_by=("cumtime",))
-
 
     def logging_setting(self):
         self.logger.removeHandler(default_handler)

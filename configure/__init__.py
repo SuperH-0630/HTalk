@@ -15,7 +15,8 @@ conf: Dict[str, any] = {
                   "%(message)s",
 
     "SECRET_KEY": "11111111",
-    "SQL_URL": "mysql://root:12345678@localhost:3306/htalk",
+    "SQLALCHEMY_DATABASE_URI": "mysql+pymysql://root:12345678@localhost:3306/htalk",
+    "SQLALCHEMY_TRACK_MODIFICATIONS": False,
 }
 
 

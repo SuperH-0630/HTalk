@@ -15,3 +15,12 @@ else:
 
 from app import HTalkFlask
 app = HTalkFlask(__name__)
+
+
+@app.shell_context_processor
+def make_shell_context():
+    from app.db import db
+    return {
+        "app": app,
+        "db": db,
+    }
