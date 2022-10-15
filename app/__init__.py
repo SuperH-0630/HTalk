@@ -23,11 +23,21 @@ class HTalkFlask(Flask):
         self.update_configure()
         self.profile_setting()
         self.logging_setting()
+        self.blueprint()
 
         db.init_app(self)
         moment.init_app(self)
         mail.init_app(self)
         migrate.init_app(self, db)
+
+        @self.context_processor
+        def inject_base():
+            """ app默认模板变量 """
+            return {"conf": conf}
+
+    def blueprint(self):
+        from .index import index
+        self.register_blueprint(index, url_prefix="/")
 
     def profile_setting(self):
         if conf["DEBUG_PROFILE"]:
@@ -52,3 +62,4 @@ class HTalkFlask(Flask):
     def update_configure(self):
         """ 更新配置 """
         self.config.update(conf)
+
