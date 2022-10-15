@@ -27,7 +27,7 @@ class HTalkFlask(Flask):
         db.init_app(self)
         moment.init_app(self)
         mail.init_app(self)
-        migrate.init_app(self)
+        migrate.init_app(self, db)
 
     def profile_setting(self):
         if conf["DEBUG_PROFILE"]:
