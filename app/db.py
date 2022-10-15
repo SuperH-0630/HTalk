@@ -1,3 +1,4 @@
+import sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, AnonymousUserMixin
 from datetime import datetime
@@ -90,7 +91,10 @@ class Archive(db.Model):
 
 
 def create_all():
-    db.create_all()
+    try:
+        db.create_all()
+    except Exception:
+        pass
 
     admin = Role(name="admin", permission=2047)
     coordinator = Role(name="coordinator", permission=1023)
