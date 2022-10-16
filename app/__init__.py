@@ -4,6 +4,7 @@ import logging
 import logging.handlers
 import os
 import sys
+from datetime import datetime
 
 from .db import db, Role, User
 from .moment import moment
@@ -35,7 +36,10 @@ class HTalkFlask(Flask):
         @self.context_processor
         def inject_base():
             """ app默认模板变量 """
-            return {"conf": conf, "Role": Role, "User": User}
+            return {"conf": conf,
+                    "Role": Role,
+                    "User": User,
+                    "datetime": datetime}
 
     def blueprint(self):
         from .index import index
@@ -43,6 +47,9 @@ class HTalkFlask(Flask):
 
         from .auth import auth
         self.register_blueprint(auth, url_prefix="/auth")
+
+        from .comment import comment
+        self.register_blueprint(comment, url_prefix="/cm")
 
     def profile_setting(self):
         if conf["DEBUG_PROFILE"]:

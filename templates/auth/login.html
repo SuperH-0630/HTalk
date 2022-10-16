@@ -22,8 +22,8 @@
     <div class="tab-pane container fade {% if on_passwd_login %} show active {% endif %}" id="passwd_login">
         <form method="post" action="{{ url_for("auth.passwd_login_page") }}" class="was-validated">
             {{ passwd_login_form.hidden_tag() }}
-            {{ macro.render_field(passwd_login_form.email) }}
-            {{ macro.render_field(passwd_login_form.passwd) }}
+            {{ render_field(passwd_login_form.email) }}
+            {{ render_field(passwd_login_form.passwd) }}
 
             <div class="text-end">
                 {{ passwd_login_form.submit(class='btn btn-success me-2') }}
@@ -34,7 +34,7 @@
     <div class="tab-pane container fade {% if on_email_login %} show active {% endif %}" id="email_login">
         <form method="post" action="{{ url_for("auth.email_login_page") }}" class="was-validated">
             {{ email_login_form.hidden_tag() }}
-            {{ macro.render_field(email_login_form.email) }}
+            {{ render_field(email_login_form.email) }}
 
             <div class="text-end">
                 {{ email_login_form.submit(class='btn btn-success me-2') }}
@@ -45,9 +45,9 @@
     <div class="tab-pane container fade {% if on_register %} show active {% endif %}" id="register">
         <form method="post" action="{{ url_for("auth.register_page") }}" class="was-validated">
             {{ register_form.hidden_tag() }}
-            {{ macro.render_field(register_form.email) }}
-            {{ macro.render_field(register_form.passwd) }}
-            {{ macro.render_field(register_form.passwd_again) }}
+            {{ render_field(register_form.email) }}
+            {{ render_field(register_form.passwd) }}
+            {{ render_field(register_form.passwd_again) }}
 
 
             <div class="text-end">

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %} 主页 {% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <div class="list-group mt-2 text-start">
+            {% for i in items %}
+                <a href="#" class="list-group-item list-group-item-action">
+                    <span class="h5"> {{ i.title }} </span>
+                    ({{ show_time(i.update_time) }}/{{ show_time(i.create_time) }})
+                    <span class="badge bg-info"> {{ i.auth.email }} </span>
+                </a>
+            {% endfor %}
+        </div>
+
+        <ul class="pagination justify-content-center mt-2">
+            {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for("comment.list_all_page", page=pagination.prev_num) }}"> 上一页 </a>
+                </li>
+            {% endif %}
+
+            {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=5, right_edge=2) %}
+                {% if p %}
+                    {% if p == pagination.page %}
+                        <li class="page-item active">
+                            <a class="page-link" href="{{ url_for("comment.list_all_page", page=p) }}"> {{ p }} </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for("comment.list_all_page", page=p) }}"> {{ p }} </a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">&hellip;</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for("comment.list_all_page", page=pagination.next_num) }}"> 下一页 </a>
+                </li>
+            {% endif %}
+        </ul>
+
+    </div>
+{% endblock %}

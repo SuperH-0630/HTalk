@@ -1,4 +1,16 @@
-{% import "macro.html" as macro %}
+{% macro render_field(field) %}
+    <div class="form-floating my-3">
+        {{ field(class="form-control", placeholder=field.label.text, **kwargs) | safe }}
+        {{ field.label }}
+        {% for error in field.errors %}
+            <div class="invalid-feedback"> {{ error }} </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro show_time(time) %}
+    {{ moment(datetime.utcfromtimestamp(datetime.timestamp(time))).format('YYYY-MM-DD HH:mm:ss') }}
+{% endmacro %}
 
 <!DOCTYPE html>
 <html lang="zh">
@@ -38,7 +50,9 @@
     {% block nav %}
         <div class="container mt-2">
             <a class="h3" href="/" style="text-decoration:none;color:#333;"> {{ conf["WEBSITE_TITLE"] }} </a>
-            <a href="{{ url_for("auth.auth_page") }}" class="btn btn-success float-end text-white"> 用户管理 </a>
+            <a href="{{ url_for("auth.auth_page") }}" class="btn btn-success float-end text-white mx-2"> 用户管理 </a>
+            <a href="#" class="btn btn-dark float-end text-white mx-2"> 归档 </a>
+            <a href="{{ url_for("base.index_page") }}" class="btn btn-danger float-end text-white mx-2"> 主页 </a>
         </div>
     {% endblock %}
 

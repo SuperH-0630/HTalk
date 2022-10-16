@@ -19,9 +19,11 @@ app = HTalkFlask(__name__)
 
 @app.shell_context_processor
 def make_shell_context():
-    from app.db import db, create_all
+    from app.db import db, create_all, create_faker_user, create_faker_comment
     return {
         "app": app,
         "db": db,
-        "create_all": create_all
+        "create_all": create_all,
+        "create_faker_user": create_faker_user,
+        "create_faker_comment": create_faker_comment,
     }
