@@ -163,3 +163,51 @@ def create_all():
 
     db.session.add_all([admin, coordinator, default])
     db.session.commit()
+
+
+def create_faker_user():
+    from faker import Faker
+    from sqlalchemy.exc import IntegrityError
+    fake = Faker("zh_CN")
+
+    count_user = 0
+    while count_user < 100:
+        user = User(email=fake.email(), passwd_hash=User.get_passwd_hash("passwd"), role_id=3)
+        db.session.add(user)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+        else:
+            count_user += 1
+
+
+def create_faker_comment(auth_max=100):
+    from random import randint, random
+    from faker import Faker
+    from sqlalchemy.exc import IntegrityError
+    fake = Faker("zh_CN")
+
+    count_comment = 0
+    while count_comment < 100:
+        title = None
+        if random() < 0.5:
+            title = "加人" + fake.company()
+
+        father = None
+        if count_comment > 10 and random() < 0.5:
+            father = randint(1, count_comment)
+
+        time = fake.past_datetime()
+
+        comment = Comment(title=title, content=fake.text(), update_time=time, create_time=time, father_id=father,
+                          auth_id=randint(1, auth_max))
+        db.session.add(comment)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+        else:
+            count_comment += 1
