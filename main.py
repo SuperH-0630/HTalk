@@ -19,8 +19,9 @@ app = HTalkFlask(__name__)
 
 @app.shell_context_processor
 def make_shell_context():
-    from app.db import db
+    from app.db import db, create_all
     return {
         "app": app,
         "db": db,
+        "create_all": create_all
     }

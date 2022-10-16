@@ -132,8 +132,8 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     create_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    auth_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=True)
-    father_id = db.Column(db.Integer, db.ForeignKey("comment.id"), primary_key=True, nullable=True)
+    auth_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    father_id = db.Column(db.Integer, db.ForeignKey("comment.id"))
     auth = db.relationship("User", back_populates="comment")
     father = db.relationship("Comment", foreign_keys="[Comment.father_id]", remote_side="[Comment.id]",
                              back_populates="son")

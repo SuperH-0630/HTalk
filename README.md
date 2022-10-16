@@ -4,9 +4,8 @@
 ## 初始化数据库
 ### 使用migration
 ```shell
-$ flask db upgrade e6b4151608e7
+$ flask db upgrade 566a5752c06e
 $ flask shell
-$ >>> from app.db import create_all  
 $ >>> create_all()
 $ >>> quit()
 ```
@@ -14,7 +13,6 @@ $ >>> quit()
 ### 不使用migration
 ```shell
 $ flask shell
-$ >>> from app.db import create_all  
 $ >>> create_all()
 $ >>> quit()
 ```
