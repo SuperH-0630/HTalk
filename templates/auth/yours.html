@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %} 用户 {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h5> 用户信息 </h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">用户ID：{{ current_user.id }}</li>
+            <li class="list-group-item">用户邮箱：{{ current_user.email }}</li>
+            <li class="list-group-item">是否封禁：{{ "否" if current_user.role.has_permission(Role.USABLE) else "是" }}</li>
+            <li class="list-group-item">角色组：{{ current_user.role.name }}</li>
+            <li class="list-group-item">用户权限：{{ current_user.role.permission }}</li>
+        </ul>
+
+        <div class="text-end">
+            <a class="btn btn-outline-danger" href="{{ url_for("auth.logout_page") }}"> 退出登录 </a>
+        </div>
+
+    </div>
+{% endblock %}

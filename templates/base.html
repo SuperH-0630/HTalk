@@ -38,43 +38,19 @@
     {% block nav %}
         <div class="container mt-2">
             <a class="h3" href="/" style="text-decoration:none;color:#333;"> {{ conf["WEBSITE_TITLE"] }} </a>
-            <a class="btn btn-success float-end text-white"> 用户信息 </a>
+            <a href="{{ url_for("auth.auth_page") }}" class="btn btn-success float-end text-white"> 用户管理 </a>
         </div>
     {% endblock %}
 
-    <div class="container mt-2">
-        <ul class="nav nav-tabs justify-content-center">
-            <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#home"> 主页 </a>
-            </li>
-            <li class="nav-item">
-                 <a class="nav-link" data-bs-toggle="tab" href="#look"> 关注 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#archive"> 归档 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#follow"> 关注的人 </a>
-            </li>
-            {% block nav_ %} {% endblock %}
-        </ul>
-
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <div class="tab-pane container fade active show" id="home">
-                主页
-            </div>
-            <div class="tab-pane fade container" id="look">
-                关注
-            </div>
-            <div class="tab-pane fade container" id="archive">
-                归档
-            </div>
-            <div class="tab-pane fade container" id="follow">
-                关注的人
-            </div>
-            {% block content_ %} {% endblock %}
+    <section class="container mt-4 mb-2">
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-info fade show">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            {{ message }}
         </div>
-    </div>
+    {% endfor %}
+    </section>
+
+    {% block content %} {% endblock %}
 </body>
 </html>

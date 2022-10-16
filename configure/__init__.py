@@ -19,7 +19,15 @@ conf: Dict[str, any] = {
     "SQLALCHEMY_TRACK_MODIFICATIONS": False,
     "LOGO": "icon.svg",
     "WEBSITE_NAME": "HTalk",
-    "WEBSITE_TITLE": "HTalk-优秀的用户交流网站"
+    "WEBSITE_TITLE": "HTalk-优秀的用户交流网站",
+    "MAIL_SERVER": "",
+    "MAIL_PORT": "",
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": False,
+    "MAIL_PASSWORD": "",
+    "MAIL_USERNAME": "",
+    "MAIL_PREFIX": "",
+    "MAIL_SENDER": "",
 }
 
 

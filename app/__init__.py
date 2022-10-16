@@ -5,10 +5,11 @@ import logging.handlers
 import os
 import sys
 
-from .db import db
+from .db import db, Role, User
 from .moment import moment
 from .mail import mail
 from .migrate import migrate
+from .login import login
 
 from configure import conf
 
@@ -29,15 +30,19 @@ class HTalkFlask(Flask):
         moment.init_app(self)
         mail.init_app(self)
         migrate.init_app(self, db)
+        login.init_app(self)
 
         @self.context_processor
         def inject_base():
             """ app默认模板变量 """
-            return {"conf": conf}
+            return {"conf": conf, "Role": Role, "User": User}
 
     def blueprint(self):
         from .index import index
         self.register_blueprint(index, url_prefix="/")
+
+        from .auth import auth
+        self.register_blueprint(auth, url_prefix="/auth")
 
     def profile_setting(self):
         if conf["DEBUG_PROFILE"]:

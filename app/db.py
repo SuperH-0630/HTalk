@@ -2,6 +2,11 @@ import sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, AnonymousUserMixin
 from datetime import datetime
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from itsdangerous.exc import BadData
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from configure import conf
 
 db = SQLAlchemy()
 
@@ -16,7 +21,9 @@ class Follow(db.Model):
 
 
 class AnonymousUser(AnonymousUserMixin):
-    pass
+    @property
+    def email(self):
+        return None
 
 
 class User(db.Model, UserMixin):
@@ -33,6 +40,48 @@ class User(db.Model, UserMixin):
                                lazy="dynamic")
     followed = db.relationship("Follow", primaryjoin="Follow.followed_id==User.id", back_populates="followed",
                                lazy="dynamic")
+
+    @staticmethod
+    def register_creat_token(email: str, passwd_hash: str):
+        s = Serializer(conf["SECRET_KEY"])
+        return s.dumps({"email": email, "passwd_hash": passwd_hash})
+
+    @staticmethod
+    def register_load_token(token: str):
+        s = Serializer(conf["SECRET_KEY"])
+        try:
+            token = s.loads(token, max_age=3600)
+            return token['email'], token['passwd_hash']
+        except (BadData, KeyError):
+            return None
+
+    def login_creat_token(self, remember_me=False):
+        s = Serializer(conf["SECRET_KEY"])
+        return s.dumps({"email": self.email, "remember_me": remember_me})
+
+    @staticmethod
+    def login_load_token(token: str):
+        s = Serializer(conf["SECRET_KEY"])
+        try:
+            token = s.loads(token, max_age=3600)
+            return token['email'], token['remember_me']
+        except (BadData, KeyError):
+            return None
+
+    @staticmethod
+    def get_passwd_hash(passwd: str):
+        return generate_password_hash(passwd)
+
+    def check_passwd(self, passwd: str):
+        return check_password_hash(self.passwd_hash, passwd)
+
+    @property
+    def passwd(self):
+        return None
+
+    @passwd.setter
+    def passwd(self, passwd):
+        self.passwd_hash = self.get_passwd_hash(passwd)
 
 
 class Role(db.Model):
@@ -54,6 +103,18 @@ class Role(db.Model):
     name = db.Column(db.String(32), nullable=False, unique=True)
     permission = db.Column(db.Integer, nullable=False, default=95)  # 非系统权限
     user = db.relationship("User", back_populates="role")
+
+
+    def has_permission(self, permission):
+        return self.permission & permission == permission
+
+    def add_permission(self, permission):
+        if not self.has_permission(permission):
+            self.permission += permission
+
+    def remove_permission(self, permission):
+        if self.has_permission(permission):
+            self.permission -= permission
 
 
 StudentClass = db.Table("archive_comment",

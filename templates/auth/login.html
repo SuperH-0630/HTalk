@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %} 用户 {% endblock %}
+
+{% block content %}
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs mt-2 justify-content-center">
+    <li class="nav-item">
+        <a class="nav-link {% if on_passwd_login %} active {% endif %}" data-bs-toggle="tab" href="#passwd_login"> 密码登录 </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if on_email_login %} active {% endif %}" data-bs-toggle="tab" href="#email_login"> 邮箱登录 </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if on_register %} active {% endif %}" data-bs-toggle="tab" href="#register"> 注册 </a>
+    </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <div class="tab-pane container fade {% if on_passwd_login %} show active {% endif %}" id="passwd_login">
+        <form method="post" action="{{ url_for("auth.passwd_login_page") }}" class="was-validated">
+            {{ passwd_login_form.hidden_tag() }}
+            {{ macro.render_field(passwd_login_form.email) }}
+            {{ macro.render_field(passwd_login_form.passwd) }}
+
+            <div class="text-end">
+                {{ passwd_login_form.submit(class='btn btn-success me-2') }}
+                {{ passwd_login_form.remember() }} {{ passwd_login_form.remember.label() }}
+            </div>
+        </form>
+    </div>
+    <div class="tab-pane container fade {% if on_email_login %} show active {% endif %}" id="email_login">
+        <form method="post" action="{{ url_for("auth.email_login_page") }}" class="was-validated">
+            {{ email_login_form.hidden_tag() }}
+            {{ macro.render_field(email_login_form.email) }}
+
+            <div class="text-end">
+                {{ email_login_form.submit(class='btn btn-success me-2') }}
+                {{ email_login_form.remember() }} {{ email_login_form.remember.label() }}
+            </div>
+        </form>
+    </div>
+    <div class="tab-pane container fade {% if on_register %} show active {% endif %}" id="register">
+        <form method="post" action="{{ url_for("auth.register_page") }}" class="was-validated">
+            {{ register_form.hidden_tag() }}
+            {{ macro.render_field(register_form.email) }}
+            {{ macro.render_field(register_form.passwd) }}
+            {{ macro.render_field(register_form.passwd_again) }}
+
+
+            <div class="text-end">
+                {{ register_form.submit(class='btn btn-success me-2') }}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
