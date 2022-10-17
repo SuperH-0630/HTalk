@@ -14,7 +14,10 @@
         </ul>
 
         <div class="text-end">
-            <a class="btn btn-outline-danger" href="{{ url_for("auth.logout_page") }}"> 退出登录 </a>
+            <div class="btn-group">
+                <a class="btn btn-outline-danger" href="{{ url_for("auth.change_passwd_page") }}"> 修改密码 </a>
+                <a class="btn btn-outline-danger" href="{{ url_for("auth.logout_page") }}"> 退出登录 </a>
+            </div>
         </div>
 
     </div>

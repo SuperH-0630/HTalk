@@ -72,6 +72,18 @@ class RegisterForm(EmailPasswd):
             raise ValidationError("邮箱已被注册")
 
 
+class ChangePasswdForm(AuthField):
+    old_passwd = AuthField.passwd_field("旧密码", "用户原密码")
+    passwd = AuthField.passwd_field("新密码", "用户新密码")
+    passwd_again = AuthField.passwd_again_field("新密码", "用户新密码")
+    submit = SubmitField("修改密码")
+
+    def validate_passwd(self, field):
+        """ 检验新旧密码是否相同 """
+        if field.data == self.old_passwd.data:
+            raise ValidationError("新旧密码不能相同")
+
+
 def __load_login_page(passwd_login_form=None, email_login_form=None, register_form=None,
                       on_passwd_login=True, on_email_login=False, on_register=False):
     if not passwd_login_form:
@@ -213,6 +225,26 @@ def email_login_confirm_page():
     Logger.print_user_opt_success_log(f"passwd login.txt {user.email}")
     return redirect(url_for("base.index_page"))
 
+
+@auth.route('/set/passwd', methods=['GET', 'POST'])
+@login_required
+def change_passwd_page():
+    form = ChangePasswdForm()
+    if form.validate_on_submit():
+        if not current_user.check_passwd(form.old_passwd.data):
+            Logger.print_user_opt_error_log(f"change passwd")
+            flash("旧密码错误")
+        else:
+            current_user.passwd = form.passwd.data
+            db.session.commit()
+
+            Logger.print_user_opt_success_log(f"change passwd")
+            flash("密码修改成功")
+            logout_user()
+            return redirect(url_for("auth.passwd_login_page"))
+        return redirect(url_for("auth.change_passwd_page"))
+    Logger.print_load_page_log("user change passwd")
+    return render_template("auth/change_passwd.html", form=form)
 
 
 @auth.route('/logout')
