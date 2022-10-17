@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %} 主页 {% endblock %}
+
+{% block content %}
+    <div class="container mt-3">
+        <div>
+            <span class="h5"> 讨论ID：{{ comment.id }} </span>
+            <a class="btn btn-warning float-end"> 添加子讨论 </a>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                {% if comment.title %}
+                    <h4 class="card-title"> {{ comment.title }} </h4>
+                {% endif %}
+                <p class="card-text"> {{ comment.content }} </p>
+                <span class="badge bg-info"> {{ comment.auth.email }} </span>
+                <p class="text-end">
+                    {% if comment.father_id %}
+                        <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=comment.father_id) }}"> 查看父讨论 </a>
+                        <br>
+                    {% endif %}
+                    评论个数：{{ comment.son_count }}
+                    <br>
+                    {{ show_time(comment.update_time) }}/{{ show_time(comment.create_time) }}
+                </p>
+            </div>
+        </div>
+
+        {% for i in comment_son %}
+            <div class="card mt-2">
+                <div class="card-body">
+                    {% if i.title %}
+                        <h4 class="card-title"> {{ i.title }} </h4>
+                    {% endif %}
+                    <p class="card-text"> {{ i.content }} </p>
+                    <span class="badge bg-info"> {{ i.auth.email }} </span>
+
+                    <p class="text-end">
+                        <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=i.id) }}"> 前往查看 </a>
+                        <br>
+                        评论个数：{{ i.son_count }}
+                        <br>
+                        {{ show_time(i.update_time) }}/{{ show_time(i.create_time) }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

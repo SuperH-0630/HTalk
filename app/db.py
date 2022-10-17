@@ -142,6 +142,11 @@ class Comment(db.Model):
     archive = db.relationship("Archive", back_populates="comment", secondary="archive_comment")
 
 
+    @property
+    def son_count(self):
+        return len(self.son)
+
+
 class Archive(db.Model):
     __tablename__ = "archive"
 
