@@ -21,7 +21,7 @@
                         <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=comment.father_id) }}"> 查看父讨论 </a>
                         <br>
                     {% endif %}
-                    评论个数：{{ comment.son_count }}
+                    子讨论个数：{{ comment.son_count }}
                     <br>
                     {{ show_time(comment.update_time) }}/{{ show_time(comment.create_time) }}
                 </p>
@@ -40,7 +40,7 @@
                     <p class="text-end">
                         <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=i.id) }}"> 前往查看 </a>
                         <br>
-                        评论个数：{{ i.son_count }}
+                        子讨论个数：{{ i.son_count }}
                         <br>
                         {{ show_time(i.update_time) }}/{{ show_time(i.create_time) }}
                     </p>

@@ -6,8 +6,14 @@
     <div class="container mt-3">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title"> {{ archive_name }} </h4>
-                <p class="card-text"> {{ archive_describe }} </p>
+                <h4 class="card-title">  用户： {{ user.email }} </h4>
+                <p class="card-text"> 
+                    用户ID：{{ user.id }}
+                    <br>
+                    粉丝：{{ user.follower_count }}
+                    <br>
+                    关注：{{ user.followed_count }}
+                </p>
             </div>
         </div>
     </div>
@@ -22,7 +28,6 @@
                             <h4 class="card-title"> {{ i.title }} </h4>
                         {% endif %}
                         <p class="card-text"> {{ i.content }} </p>
-                        <a class="badge bg-info text-white" href="{{ url_for("auth.user_page", user=i.auth.id) }}"> {{ i.auth.email }} </a>
 
                         <p class="text-end">
                             <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=i.id) }}"> 前往查看 </a>
@@ -39,7 +44,7 @@
         <ul class="pagination justify-content-center mt-2">
             {% if pagination.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for("comment.list_all_page", page=pagination.prev_num, archive=archive) }}"> 上一页 </a>
+                    <a class="page-link" href="{{ url_for("comment.list_all_page", page=pagination.prev_num, user=user.id) }}"> 上一页 </a>
                 </li>
             {% endif %}
 
@@ -47,11 +52,11 @@
                 {% if p %}
                     {% if p == pagination.page %}
                         <li class="page-item active">
-                            <a class="page-link" href="{{ url_for("comment.list_all_page", page=p, archive=archive) }}"> {{ p }} </a>
+                            <a class="page-link" href="{{ url_for("comment.list_all_page", page=p, user=user.id) }}"> {{ p }} </a>
                         </li>
                     {% else %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for("comment.list_all_page", page=p, archive=archive) }}"> {{ p }} </a>
+                            <a class="page-link" href="{{ url_for("comment.list_all_page", page=p, user=user.id) }}"> {{ p }} </a>
                         </li>
                     {% endif %}
                 {% else %}
@@ -63,7 +68,7 @@
 
             {% if pagination.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for("comment.list_all_page", page=pagination.next_num, archive=archive) }}"> 下一页 </a>
+                    <a class="page-link" href="{{ url_for("comment.list_all_page", page=pagination.next_num, user=user.id) }}"> 下一页 </a>
                 </li>
             {% endif %}
         </ul>

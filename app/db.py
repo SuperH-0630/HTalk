@@ -34,12 +34,16 @@ class User(db.Model, UserMixin):
     passwd_hash = db.Column(db.String(128), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey("role.id"), default=3)
     role = db.relationship("Role", back_populates="user")
-    comment = db.relationship("Comment", back_populates="auth")
+    comment = db.relationship("Comment", back_populates="auth", lazy="dynamic")
 
     followed = db.relationship("Follow", primaryjoin="Follow.follower_id==User.id", back_populates="follower",
                                lazy="dynamic")  # User 关注的人
     follower = db.relationship("Follow", primaryjoin="Follow.followed_id==User.id", back_populates="followed",
                                lazy="dynamic")  # 关注 User 的人
+
+    @property
+    def comment_count(self):
+        return self.comment.count()
 
     @property
     def follower_count(self):

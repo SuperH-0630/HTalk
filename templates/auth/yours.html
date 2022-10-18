@@ -13,6 +13,7 @@
             <a class="list-group-item">用户权限：{{ current_user.role.permission }}</a>
             <a class="list-group-item" href="{{ url_for("auth.followed_page") }}">关注：{{ current_user.followed_count }}</a>
             <a class="list-group-item" href="{{ url_for("auth.follower_page") }}">粉丝：{{ current_user.follower_count }}</a>
+            <a class="list-group-item" href="{{ url_for("comment.user_page", page=1, user=current_user.id) }}">讨论：{{ current_user.comment_count }}</a>
         </div>
 
         <div class="text-end">
