@@ -117,11 +117,11 @@ class Role(db.Model):
             self.permission -= permission
 
 
-StudentClass = db.Table("archive_comment",
-                        db.Column("archive_id", db.Integer, db.ForeignKey("archive.id"),
-                                  nullable=False, primary_key=True),
-                        db.Column("comment_id", db.Integer, db.ForeignKey("comment.id"),
-                                  nullable=False, primary_key=True))
+ArchiveComment = db.Table("archive_comment",
+                          db.Column("archive_id", db.Integer, db.ForeignKey("archive.id"),
+                                    nullable=False, primary_key=True),
+                          db.Column("comment_id", db.Integer, db.ForeignKey("comment.id"),
+                                    nullable=False, primary_key=True))
 
 
 class Comment(db.Model):
@@ -154,6 +154,10 @@ class Archive(db.Model):
     name = db.Column(db.String(32), nullable=False, unique=True)
     describe = db.Column(db.String(100), nullable=False)
     comment = db.relationship("Comment", back_populates="archive", secondary="archive_comment")
+
+    @property
+    def comment_count(self):
+        return len(self.comment)
 
 
 def create_all():
@@ -216,3 +220,43 @@ def create_faker_comment(auth_max=100):
             db.session.rollback()
         else:
             count_comment += 1
+
+
+def create_faker_archive():
+    from faker import Faker
+    from sqlalchemy.exc import IntegrityError
+    fake = Faker("zh_CN")
+
+    count_archive = 0
+    while count_archive < 20:
+        company = fake.company()
+        archive = Archive(name=company, describe=f"加人{company}")
+        db.session.add(archive)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+        else:
+            count_archive += 1
+
+
+def create_fake_archive_comment():
+    from random import randint
+    from sqlalchemy.exc import IntegrityError
+
+    comment_count = Comment.query.count()
+    archive_count = Archive.query.count()
+
+    count_archive_comment = 0
+    while count_archive_comment < 20:
+        comment = Comment.query.offset(randint(0, comment_count)).limit(1).first()
+        archive = Archive.query.offset(randint(0, archive_count)).limit(1).first()
+        archive.archive.append(comment)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+        else:
+            count_archive_comment += 1

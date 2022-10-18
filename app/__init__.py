@@ -51,6 +51,9 @@ class HTalkFlask(Flask):
         from .comment import comment
         self.register_blueprint(comment, url_prefix="/cm")
 
+        from .archive import archive
+        self.register_blueprint(archive, url_prefix="/ac")
+
     def profile_setting(self):
         if conf["DEBUG_PROFILE"]:
             self.wsgi_app = ProfilerMiddleware(self.wsgi_app, sort_by=("cumtime",))
