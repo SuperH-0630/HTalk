@@ -49,6 +49,13 @@ class User(db.Model, UserMixin):
     def followed_count(self):
         return self.followed.count()
 
+    def in_followed(self, user):
+        user_id = user.id
+        if Follow.query.filter_by(followed_id=user_id, follower_id=self.id).first():
+            return True
+        return False
+
+
     @staticmethod
     def register_creat_token(email: str, passwd_hash: str):
         s = Serializer(conf["SECRET_KEY"])

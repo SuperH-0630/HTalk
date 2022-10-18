@@ -8,9 +8,10 @@ from wtforms import (EmailField,
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urljoin
+from sqlalchemy.exc import IntegrityError
 
 
-from .db import db, User, Role
+from .db import db, User, Role, Follow
 from .logger import Logger
 from .mail import send_msg
 
@@ -293,3 +294,40 @@ def followed_page():
                            items=[i.followed for i in pagination.items],
                            pagination=pagination,
                            title="关注")
+
+
+@auth.route("/followed/follow")
+def set_follow_page():
+    user_id = request.args.get("user", 1, type=int)
+    if user_id == current_user.id:
+        return abort(404)
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return abort(404)
+
+    try:
+        db.session.add(Follow(follower=current_user, followed=user))
+        db.session.commit()
+    except IntegrityError:
+        flash("不能重复关注用户")
+    else:
+        flash("关注用户成功")
+
+    return redirect(url_for("auth.user_page", user=user_id))
+
+
+@auth.route("/followed/unfollow")
+def set_unfollow_page():
+    user_id = request.args.get("user", 1, type=int)
+    if user_id == current_user.id:
+        return abort(404)
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return abort(404)
+
+    Follow.query.filter_by(follower=current_user, followed=user).delete()
+    flash("取消关注用户成功")
+
+    return redirect(url_for("auth.user_page", user=user_id))

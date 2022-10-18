@@ -15,7 +15,11 @@
 
         <div class="text-end">
             <div class="btn-group">
-                <a class="btn btn-outline-danger" href="#"> 关注 </a>
+                {% if current_user.in_followed(user) %}
+                    <a class="btn btn-outline-danger" href="{{ url_for("auth.set_unfollow_page", user=user.id) }}"> 取消关注 </a>
+                {% else %}
+                    <a class="btn btn-outline-danger" href="{{ url_for("auth.set_follow_page", user=user.id) }}"> 关注 </a>
+                {% endif %}
             </div>
         </div>
 
