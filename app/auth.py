@@ -255,3 +255,15 @@ def logout_page():
     flash("退出登录成功")
     return redirect(url_for("base.index_page"))
 
+
+@auth.route("/user")
+def user_page():
+    user_id = request.args.get("user", -1, type=int)
+    if user_id == -1:
+        return abort(404)
+    elif current_user.is_authenticated and current_user.id == user_id:
+        return redirect(url_for("auth.auth_page"))
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return abort(404)
+    return render_template("auth/user.html", user=user)
