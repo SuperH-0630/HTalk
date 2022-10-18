@@ -138,13 +138,13 @@ class Comment(db.Model):
     father = db.relationship("Comment", foreign_keys="[Comment.father_id]", remote_side="[Comment.id]",
                              back_populates="son")
     son = db.relationship("Comment", foreign_keys="[Comment.father_id]", remote_side="[Comment.father_id]",
-                          back_populates="father")
+                          back_populates="father", lazy="dynamic")
     archive = db.relationship("Archive", back_populates="comment", secondary="archive_comment")
 
 
     @property
     def son_count(self):
-        return len(self.son)
+        return self.son.count()
 
 
 class Archive(db.Model):
@@ -153,11 +153,11 @@ class Archive(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
     name = db.Column(db.String(32), nullable=False, unique=True)
     describe = db.Column(db.String(100), nullable=False)
-    comment = db.relationship("Comment", back_populates="archive", secondary="archive_comment")
+    comment = db.relationship("Comment", back_populates="archive", secondary="archive_comment", lazy="dynamic")
 
     @property
     def comment_count(self):
-        return len(self.comment)
+        return self.comment.filter(Comment.title != None).filter(Comment.father_id == None).count()
 
 
 def create_all():

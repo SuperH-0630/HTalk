@@ -12,7 +12,7 @@
                         <p class="card-text"> {{ i.describe }} </p>
 
                         <p class="text-end">
-                            <a class="btn btn-link" href="#"> 前往查看 </a>
+                            <a class="btn btn-link" href="{{ url_for("comment.list_all_page", archive=i.id, page=1) }}"> 前往查看 </a>
                             <br>
                             评论个数：{{ i.comment_count }}
                         </p>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, abort
 
-from .db import Comment
+from .db import Comment,Archive
 
 
 comment = Blueprint("comment", __name__)
@@ -22,13 +22,32 @@ def comment_page():
 @comment.route("/all")
 def list_all_page():
     page = request.args.get("page", 1, type=int)
-    pagination = (Comment.query
-                  .filter(Comment.title != None).filter(Comment.father_id == None)
-                  .order_by(Comment.create_time.desc(), Comment.title.desc())
-                  .paginate(page=page, per_page=8, error_out=False))
-    return render_template("comment/list.html",
-                           page=page,
-                           items=pagination.items,
-                           pagination=pagination,
-                           archive_name="全部讨论",
-                           archive_describe="罗列了本站所有的讨论")
+    archive_id = request.args.get("archive", -1, type=int)
+
+    if archive_id == -1:
+        pagination = (Comment.query
+                      .filter(Comment.title != None).filter(Comment.father_id == None)
+                      .order_by(Comment.create_time.desc(), Comment.title.desc())
+                      .paginate(page=page, per_page=8, error_out=False))
+        return render_template("comment/list.html",
+                               page=page,
+                               archive=archive_id,
+                               items=pagination.items,
+                               pagination=pagination,
+                               archive_name="全部讨论",
+                               archive_describe="罗列了本站所有的讨论")
+    else:
+        archive = Archive.query.filter_by(id=archive_id).first()
+        if not archive:
+            return abort(404)
+        pagination = (archive.comment
+                      .filter(Comment.title != None).filter(Comment.father_id == None)
+                      .order_by(Comment.create_time.desc(), Comment.title.desc())
+                      .paginate(page=page, per_page=8, error_out=False))
+        return render_template("comment/list.html",
+                               page=page,
+                               archive=archive_id,
+                               items=pagination.items,
+                               pagination=pagination,
+                               archive_name=archive.name,
+                               archive_describe=archive.describe)
