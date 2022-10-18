@@ -267,3 +267,29 @@ def user_page():
     if not user:
         return abort(404)
     return render_template("auth/user.html", user=user)
+
+
+@auth.route("/follower/list")
+def follower_page():
+    if current_user.follower_count == 0:
+        return render_template("auth/no_follow.html", title="粉丝", msg="你暂时一个粉丝都没有哦。")
+
+    page = request.args.get("page", 1, type=int)
+    pagination = current_user.follower.paginate(page=page, per_page=8, error_out=False)
+    return render_template("auth/follow.html",
+                           items=[i.follower for i in pagination.items],
+                           pagination=pagination,
+                           title="粉丝")
+
+
+@auth.route("/followed/list")
+def followed_page():
+    if current_user.followed_count == 0:
+        return render_template("auth/no_follow.html", title="关注", msg="你暂时未关注任何人。")
+
+    page = request.args.get("page", 1, type=int)
+    pagination = current_user.followed.paginate(page=page, per_page=8, error_out=False)
+    return render_template("auth/follow.html",
+                           items=[i.followed for i in pagination.items],
+                           pagination=pagination,
+                           title="关注")

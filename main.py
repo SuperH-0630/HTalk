@@ -23,7 +23,8 @@ def make_shell_context():
                         create_faker_user,
                         create_faker_comment,
                         create_faker_archive,
-                        create_fake_archive_comment)
+                        create_fake_archive_comment,
+                        create_fake_follow)
     return {
         "app": app,
         "db": db,
@@ -32,4 +33,5 @@ def make_shell_context():
         "create_faker_comment": create_faker_comment,
         "create_faker_archive": create_faker_archive,
         "create_fake_archive_comment": create_fake_archive_comment,
+        "create_fake_follow": create_fake_follow,
     }

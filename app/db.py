@@ -13,10 +13,10 @@ db = SQLAlchemy()
 
 class Follow(db.Model):
     time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    follower_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=True)
-    followed_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=True)
-    follower = db.relationship("User", primaryjoin="Follow.follower_id==User.id", back_populates="follower")
-    followed = db.relationship("User", primaryjoin="Follow.followed_id==User.id", back_populates="followed")
+    follower_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=True)  # 关注者
+    followed_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=True)  # 被关注者
+    follower = db.relationship("User", primaryjoin="Follow.follower_id==User.id", back_populates="followed")
+    followed = db.relationship("User", primaryjoin="Follow.followed_id==User.id", back_populates="follower")
 
 
 
@@ -36,10 +36,18 @@ class User(db.Model, UserMixin):
     role = db.relationship("Role", back_populates="user")
     comment = db.relationship("Comment", back_populates="auth")
 
-    follower = db.relationship("Follow", primaryjoin="Follow.follower_id==User.id", back_populates="follower",
-                               lazy="dynamic")
-    followed = db.relationship("Follow", primaryjoin="Follow.followed_id==User.id", back_populates="followed",
-                               lazy="dynamic")
+    followed = db.relationship("Follow", primaryjoin="Follow.follower_id==User.id", back_populates="follower",
+                               lazy="dynamic")  # User 关注的人
+    follower = db.relationship("Follow", primaryjoin="Follow.followed_id==User.id", back_populates="followed",
+                               lazy="dynamic")  # 关注 User 的人
+
+    @property
+    def follower_count(self):
+        return self.follower.count()
+
+    @property
+    def followed_count(self):
+        return self.followed.count()
 
     @staticmethod
     def register_creat_token(email: str, passwd_hash: str):
@@ -253,6 +261,32 @@ def create_fake_archive_comment():
         comment = Comment.query.offset(randint(0, comment_count)).limit(1).first()
         archive = Archive.query.offset(randint(0, archive_count)).limit(1).first()
         archive.archive.append(comment)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+        else:
+            count_archive_comment += 1
+
+
+def create_fake_follow():
+    from random import randint
+    from sqlalchemy.exc import IntegrityError
+
+    user_count = User.query.count()
+
+    count_archive_comment = 0
+    while count_archive_comment < 20:
+        follower_id = randint(0, user_count)
+        followed_id = randint(0, user_count)
+        if follower_id == followed_id:
+            continue
+
+        follower = User.query.offset(follower_id).limit(1).first()
+        followed = User.query.offset(followed_id).limit(1).first()
+        follow = Follow(followed=followed, follower=follower)
+        db.session.add(follow)
 
         try:
             db.session.commit()

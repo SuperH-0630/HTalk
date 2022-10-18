@@ -5,15 +5,17 @@
 {% block content %}
     <div class="container">
         <h5> 用户信息 </h5>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">用户ID：{{ user.id }}</li>
-            <li class="list-group-item">用户邮箱：{{ user.email }}</li>
-            <li class="list-group-item">是否封禁：{{ "否" if user.role.has_permission(Role.USABLE) else "是" }}</li>
-        </ul>
+        <div class="list-group list-group-flush">
+            <a class="list-group-item">用户ID：{{ user.id }}</a>
+            <a class="list-group-item">用户邮箱：{{ user.email }}</a>
+            <a class="list-group-item">是否封禁：{{ "否" if user.role.has_permission(Role.USABLE) else "是" }} </a>
+            <a class="list-group-item">关注：{{ user.followed_count }}</a>
+            <a class="list-group-item">粉丝：{{ user.follower_count }}</a>
+        </div>
 
         <div class="text-end">
             <div class="btn-group">
-                <a class="btn btn-outline-danger" href="{{ url_for("auth.logout_page") }}"> 关注 </a>
+                <a class="btn btn-outline-danger" href="#"> 关注 </a>
             </div>
         </div>
 

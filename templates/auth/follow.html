@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <div class="mt-2 text-start">
+            {% for i in items %}
+                <div class="card mt-2">
+                    <div class="card-body">
+                        <h4 class="card-title"> 用户: {{ i.email }} </h4>
+                        <p class="card-text">  ID: {{ i.id }} </p>
+                        <p class="text-end">
+                            <a class="btn btn-link" href="{{ url_for("auth.user_page", user=i.id) }}"> 前往查看 </a>
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <ul class="pagination justify-content-center mt-2">
+            {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for("auth.follower_page", page=pagination.prev_num) }}"> 上一页 </a>
+                </li>
+            {% endif %}
+
+            {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=5, right_edge=2) %}
+                {% if p %}
+                    {% if p == pagination.page %}
+                        <li class="page-item active">
+                            <a class="page-link" href="{{ url_for("auth.follower_page", page=p) }}"> {{ p }} </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for("auth.follower_page", page=p) }}"> {{ p }} </a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">&hellip;</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for("auth.follower_page", page=pagination.next_num) }}"> 下一页 </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}
