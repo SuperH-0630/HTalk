@@ -119,7 +119,7 @@ def passwd_login_page():
     form = PasswdLoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_passwd(form.passwd.data):
+        if user and user.check_passwd(form.passwd.data) and user.role.has_permission(Role.USABLE):
             login_user(user, form.remember.data)
             next_page = request.args.get("next")
             if next_page is None or not next_page.startswith('/'):
@@ -142,7 +142,7 @@ def email_login_page():
     form = EmailLoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user:
+        if user and user.role.has_permission(Role.USABLE):
             token = user.login_creat_token(form.remember.data)
             login_url = urljoin(request.host_url, url_for("auth.email_login_confirm_page", token=token))
             send_msg("登录确认", user.email, "login", login_url=login_url)
@@ -329,5 +329,25 @@ def set_unfollow_page():
 
     Follow.query.filter_by(follower=current_user, followed=user).delete()
     flash("取消关注用户成功")
+
+    return redirect(url_for("auth.user_page", user=user_id))
+
+
+@auth.route("/block")
+def set_block_page():
+    user_id = request.args.get("user", 1, type=int)
+    if user_id == current_user.id:
+        return abort(404)
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return abort(404)
+
+    block = Role.query.filter_by(name="block").first()
+    if not block:
+        return abort(500)
+
+    user.role = block
+    db.session.commit()
 
     return redirect(url_for("auth.user_page", user=user_id))

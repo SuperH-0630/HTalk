@@ -188,8 +188,9 @@ def create_all():
     admin = Role(name="admin", permission=2047)
     coordinator = Role(name="coordinator", permission=1023)
     default = Role(name="default")
+    block = Role(name="block", permission=0)
 
-    db.session.add_all([admin, coordinator, default])
+    db.session.add_all([admin, coordinator, default, block])
     db.session.commit()
 
 
