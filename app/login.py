@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import abort
 from flask_login import LoginManager, current_user
-from .db import AnonymousUser, User
+from .db import AnonymousUser, User, Role
 
 
 login = LoginManager()
@@ -11,7 +11,12 @@ login.login_view = "auth.passwd_login_page"
 
 @login.user_loader
 def user_loader(user_id: int):
-    return User.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return None
+    if user.role.has_permission(Role.USABLE):
+        return user
+    return None
 
 
 def role_required(role: int):
