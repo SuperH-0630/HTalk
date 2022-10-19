@@ -4,7 +4,8 @@ from wtforms import (EmailField,
                      PasswordField,
                      BooleanField,
                      SubmitField,
-                     ValidationError)
+                     ValidationError,
+                     StringField)
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urljoin
@@ -83,6 +84,21 @@ class ChangePasswdForm(AuthField):
         """ 检验新旧密码是否相同 """
         if field.data == self.old_passwd.data:
             raise ValidationError("新旧密码不能相同")
+
+
+class ChangeRoleForm(AuthField):
+    email = AuthField.email_field("邮箱", "用户邮箱")
+    role = StringField("角色", description="用户角色", validators=[DataRequired(message="必须指定用户角色")])
+    submit = SubmitField("修改")
+
+    def validate_role(self, field):
+        if not Role.query.filter_by(name=field.data).first():
+            raise ValidationError("角色不存在")
+
+
+    def validate_email(self, field):
+        if not User.query.filter_by(email=field.data).first():
+            raise ValidationError("用户不存在")
 
 
 def __load_login_page(passwd_login_form=None, email_login_form=None, register_form=None,
@@ -351,3 +367,24 @@ def set_block_page():
     db.session.commit()
 
     return redirect(url_for("auth.user_page", user=user_id))
+
+
+@auth.route('/role/user', methods=['GET', 'POST'])
+def change_role_page():
+    form = ChangeRoleForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if not user:
+            flash("用户不存在")
+            return redirect(url_for("auth.change_role_page"))
+
+        role = Role.query.filter_by(name=form.role.data).first()
+        if not role:
+            flash("角色不存在")
+            return redirect(url_for("auth.change_role_page"))
+
+        user.role = role
+        db.session.commit()
+        flash("用户分组修改成功")
+        return redirect(url_for("auth.change_role_page"))
+    return render_template("auth/change_role.html", form=form)

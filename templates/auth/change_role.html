@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} 用户 {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="post" action="{{ url_for("auth.change_role_page") }}" class="was-validated">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.role) }}
+
+            <div class="text-end">
+                {{ form.submit(class='btn btn-success me-2') }}
+            </div>
+        </form>
+    </div>
+{% endblock %}
