@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} 创建 {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="post" action="{{ url_for("archive.create_page") }}" class="was-validated">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.name) }}
+            {{ render_field(form.describe) }}
+
+            <div class="text-end">
+                {{ form.submit(class='btn btn-success me-2') }}
+            </div>
+        </form>
+    </div>
+{% endblock %}

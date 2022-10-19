@@ -52,7 +52,7 @@ def list_all_page():
     page = request.args.get("page", 1, type=int)
     archive_id = request.args.get("archive", None, type=int)
 
-    if not archive_id == -1:
+    if not archive_id:
         pagination = (Comment.query
                       .filter(Comment.title != None).filter(Comment.father_id == None)
                       .order_by(Comment.create_time.desc(), Comment.title.desc())
