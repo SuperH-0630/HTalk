@@ -1,4 +1,4 @@
-import sqlalchemy
+from flask import abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, AnonymousUserMixin
 from datetime import datetime
@@ -24,6 +24,13 @@ class AnonymousUser(AnonymousUserMixin):
     @property
     def email(self):
         return None
+
+    @property
+    def role(self):
+        anonymous = Role.query.filter_by(name="anonymous").first()
+        if not anonymous:
+            return abort(500)
+        return anonymous
 
 
 class User(db.Model, UserMixin):
@@ -114,9 +121,7 @@ class Role(db.Model):
     CREATE_ARCHIVE = 32  # 系统权限
     FOLLOW = 64
     BLOCK_USER = 128  # 系统权限
-    DELETE_COMMENT = 256  # 系统权限
-    DELETE_ARCHIVE = 512  # 系统权限
-    SYSTEM = 1024  # 系统权限
+    SYSTEM = 256  # 系统权限
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
     name = db.Column(db.String(32), nullable=False, unique=True)
@@ -185,12 +190,13 @@ def create_all():
     except Exception:
         pass
 
-    admin = Role(name="admin", permission=2047)
-    coordinator = Role(name="coordinator", permission=1023)
+    admin = Role(name="admin", permission=511)
+    coordinator = Role(name="coordinator", permission=255)
     default = Role(name="default")
     block = Role(name="block", permission=0)
+    anonymous = Role(name="anonymous", permission=15)
 
-    db.session.add_all([admin, coordinator, default, block])
+    db.session.add_all([admin, coordinator, default, block, anonymous])
     db.session.commit()
 
 

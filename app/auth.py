@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from .db import db, User, Role, Follow
 from .logger import Logger
 from .mail import send_msg
+from .login import role_required
 
 
 auth = Blueprint("auth", __name__)
@@ -288,6 +289,7 @@ def user_page():
 
 @auth.route("/follower/list")
 @login_required
+@role_required(Role.CHECK_FOLLOW)
 def follower_page():
     if current_user.follower_count == 0:
         return render_template("auth/no_follow.html", title="粉丝", msg="你暂时一个粉丝都没有哦。")
@@ -302,6 +304,7 @@ def follower_page():
 
 @auth.route("/followed/list")
 @login_required
+@role_required(Role.CHECK_FOLLOW)
 def followed_page():
     if current_user.followed_count == 0:
         return render_template("auth/no_follow.html", title="关注", msg="你暂时未关注任何人。")
@@ -316,6 +319,7 @@ def followed_page():
 
 @auth.route("/followed/follow")
 @login_required
+@role_required(Role.FOLLOW)
 def set_follow_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -338,6 +342,7 @@ def set_follow_page():
 
 @auth.route("/followed/unfollow")
 @login_required
+@role_required(Role.FOLLOW)
 def set_unfollow_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -355,6 +360,7 @@ def set_unfollow_page():
 
 @auth.route("/block")
 @login_required
+@role_required(Role.BLOCK_USER)
 def set_block_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -376,6 +382,7 @@ def set_block_page():
 
 @auth.route('/role/user', methods=['GET', 'POST'])
 @login_required
+@role_required(Role.SYSTEM)
 def change_role_page():
     form = ChangeRoleForm()
     if form.validate_on_submit():

@@ -5,7 +5,8 @@ from wtforms.validators import DataRequired, Length
 from flask_login import current_user, login_required
 
 
-from .db import db, Comment, Archive, User
+from .db import db, Comment, Archive, User, Role
+from .login import role_required
 
 
 comment = Blueprint("comment", __name__)
@@ -34,6 +35,7 @@ class WriteCommentForm(FlaskForm):
 
 
 @comment.route("/")
+@role_required(Role.CHECK_COMMENT)
 def comment_page():
     comment_id = request.args.get("comment", None, type=int)
     if not comment_id:
@@ -48,6 +50,7 @@ def comment_page():
 
 
 @comment.route("/all")
+@role_required(Role.CHECK_COMMENT)
 def list_all_page():
     page = request.args.get("page", 1, type=int)
     archive_id = request.args.get("archive", None, type=int)
@@ -84,6 +87,7 @@ def list_all_page():
 
 
 @comment.route("/user")
+@role_required(Role.CHECK_COMMENT)
 def user_page():
     page = request.args.get("page", 1, type=int)
     user_id = request.args.get("user", None, type=int)
@@ -107,6 +111,7 @@ def user_page():
 
 @comment.route("/create", methods=["GET", "POST"])
 @login_required
+@role_required(Role.CREATE_COMMENT)
 def create_page():
     father_id = request.args.get("father", None, type=int)
 

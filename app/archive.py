@@ -4,7 +4,9 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length, ValidationError
 from flask_login import login_required
 
-from .db import db, Archive
+from .db import db, Archive, Role
+from .login import role_required
+
 
 archive = Blueprint("archive", __name__)
 
@@ -26,6 +28,7 @@ class CreateArchiveForm(FlaskForm):
 
 
 @archive.route("/all")
+@role_required(Role.CHECK_ARCHIVE)
 def list_all_page():
     page = request.args.get("page", 1, type=int)
     pagination = (Archive.query
@@ -40,6 +43,7 @@ def list_all_page():
 
 @archive.route("/create", methods=["GET", "POST"])
 @login_required
+@role_required(Role.CREATE_ARCHIVE)
 def create_page():
     form = CreateArchiveForm()
     if form.validate_on_submit():

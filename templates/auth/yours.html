@@ -18,9 +18,15 @@
 
         <div class="text-end">
             <div class="btn-group">
-                <a class="btn btn-outline-danger" href="{{ url_for("auth.change_role_page") }}"> 修改分组 </a>
-                <a class="btn btn-outline-danger" href="{{ url_for("archive.create_page") }}"> 创建新归档 </a>
-                <a class="btn btn-outline-danger" href="{{ url_for("comment.create_page") }}"> 创建新讨论 </a>
+                {% if current_user.role.has_permission(Role.SYSTEM) %}
+                    <a class="btn btn-outline-danger" href="{{ url_for("auth.change_role_page") }}"> 修改分组 </a>
+                {% endif %}
+                {% if current_user.role.has_permission(Role.CREATE_ARCHIVE) %}
+                    <a class="btn btn-outline-danger" href="{{ url_for("archive.create_page") }}"> 创建新归档 </a>
+                {% endif %}
+                {% if current_user.role.has_permission(Role.CREATE_COMMENT) %}
+                    <a class="btn btn-outline-danger" href="{{ url_for("comment.create_page") }}"> 创建新讨论 </a>
+                {% endif %}
                 <a class="btn btn-outline-danger" href="{{ url_for("auth.change_passwd_page") }}"> 修改密码 </a>
                 <a class="btn btn-outline-danger" href="{{ url_for("auth.logout_page") }}"> 退出登录 </a>
             </div>

@@ -16,7 +16,7 @@
 
         <div class="text-end">
             <div class="btn-group">
-                {% if user.role.has_permission(Role.USABLE) %}
+                {% if user.role.has_permission(Role.USABLE) and current_user.role.has_permission(Role.BLOCK_USER) %}
                     <a class="btn btn-outline-danger" href="{{ url_for("auth.set_block_page", user=user.id) }}"> 封禁 </a>
                 {% endif %}
 
