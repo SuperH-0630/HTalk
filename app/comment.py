@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, abort, flash, redirect, u
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, StringField, SelectMultipleField, SubmitField, ValidationError
 from wtforms.validators import DataRequired, Length
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 
 from .db import db, Comment, Archive, User
@@ -106,6 +106,7 @@ def user_page():
 
 
 @comment.route("/create", methods=["GET", "POST"])
+@login_required
 def create_page():
     father_id = request.args.get("father", None, type=int)
 
@@ -131,6 +132,3 @@ def create_page():
         flash("讨论发表成功")
         return redirect(url_for("comment.comment_page", comment=cm.id))
     return render_template("comment/create.html", form=form, father=father)
-
-
-

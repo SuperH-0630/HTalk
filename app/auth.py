@@ -287,6 +287,7 @@ def user_page():
 
 
 @auth.route("/follower/list")
+@login_required
 def follower_page():
     if current_user.follower_count == 0:
         return render_template("auth/no_follow.html", title="粉丝", msg="你暂时一个粉丝都没有哦。")
@@ -300,6 +301,7 @@ def follower_page():
 
 
 @auth.route("/followed/list")
+@login_required
 def followed_page():
     if current_user.followed_count == 0:
         return render_template("auth/no_follow.html", title="关注", msg="你暂时未关注任何人。")
@@ -313,6 +315,7 @@ def followed_page():
 
 
 @auth.route("/followed/follow")
+@login_required
 def set_follow_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -334,6 +337,7 @@ def set_follow_page():
 
 
 @auth.route("/followed/unfollow")
+@login_required
 def set_unfollow_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -350,6 +354,7 @@ def set_unfollow_page():
 
 
 @auth.route("/block")
+@login_required
 def set_block_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -370,6 +375,7 @@ def set_block_page():
 
 
 @auth.route('/role/user', methods=['GET', 'POST'])
+@login_required
 def change_role_page():
     form = ChangeRoleForm()
     if form.validate_on_submit():

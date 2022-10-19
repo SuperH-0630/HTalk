@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, url_for, redirect
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length, ValidationError
+from flask_login import login_required
 
 from .db import db, Archive
 
@@ -38,6 +39,7 @@ def list_all_page():
 
 
 @archive.route("/create", methods=["GET", "POST"])
+@login_required
 def create_page():
     form = CreateArchiveForm()
     if form.validate_on_submit():
