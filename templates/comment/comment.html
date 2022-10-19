@@ -6,7 +6,7 @@
     <div class="container mt-3">
         <div>
             <span class="h5"> 讨论ID：{{ comment.id }} </span>
-            <a class="btn btn-warning float-end"> 添加子讨论 </a>
+            <a class="btn btn-warning float-end" href="{{ url_for("comment.create_page", father=comment.id) }}"> 添加子讨论 </a>
         </div>
 
         <div class="card mt-4">
@@ -18,7 +18,7 @@
                 <a class="badge bg-info text-white" href="{{ url_for("auth.user_page", user=comment.auth.id) }}"> {{ comment.auth.email }} </a>
                 <p class="text-end">
                     {% if comment.father_id %}
-                        <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=comment.father_id) }}"> 查看父讨论 </a>
+                        <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment=comment.father_id) }}"> 查看父讨论 </a>
                         <br>
                     {% endif %}
                     子讨论个数：{{ comment.son_count }}
@@ -38,7 +38,7 @@
                     <a class="badge bg-info text-white" href="{{ url_for("auth.user_page", user=i.auth.id) }}"> {{ i.auth.email }} </a>
 
                     <p class="text-end">
-                        <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=i.id) }}"> 前往查看 </a>
+                        <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment=i.id) }}"> 前往查看 </a>
                         <br>
                         子讨论个数：{{ i.son_count }}
                         <br>

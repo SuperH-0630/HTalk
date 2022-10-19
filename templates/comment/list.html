@@ -25,7 +25,7 @@
                         <a class="badge bg-info text-white" href="{{ url_for("auth.user_page", user=i.auth.id) }}"> {{ i.auth.email }} </a>
 
                         <p class="text-end">
-                            <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment_id=i.id) }}"> 前往查看 </a>
+                            <a class="btn btn-link" href="{{ url_for("comment.comment_page", comment=i.id) }}"> 前往查看 </a>
                             <br>
                             子讨论个数：{{ i.son_count }}
                             <br>

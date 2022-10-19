@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} 创建 {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="post"
+              {% if father %}
+                action="{{ url_for("comment.create_page", father=father.id) }}"
+              {% else %}
+                action="{{ url_for("comment.create_page") }}"
+              {% endif %}
+              class="was-validated">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.title) }}
+            {{ render_select_field(form.archive) }}
+            {{ render_text_field(form.content) }}
+
+            <div class="text-end">
+                {{ form.submit(class='btn btn-success me-2') }}
+            </div>
+        </form>
+    </div>
+{% endblock %}

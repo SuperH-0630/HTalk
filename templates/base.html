@@ -1,12 +1,32 @@
 {% macro render_field(field) %}
     <div class="form-floating my-3">
-        {{ field(class="form-control", placeholder=field.label.text, **kwargs) | safe }}
+        {{ field(class="form-control", placeholder=field.label.text) | safe }}
         {{ field.label }}
         {% for error in field.errors %}
             <div class="invalid-feedback"> {{ error }} </div>
         {% endfor %}
     </div>
 {% endmacro %}
+
+{% macro render_text_field(field) %}
+    <div class="form-floating my-3">
+        {{ field(class="form-control", placeholder=field.label.text, style="height: 40vh") | safe }}
+        {{ field.label }}
+        {% for error in field.errors %}
+            <div class="invalid-feedback"> {{ error }} </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro render_select_field(field) %}
+    <div class="my-3">
+        {{ field(class="form-select") | safe }}
+        {% for error in field.errors %}
+            <div class="invalid-feedback"> {{ error }} </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
 
 {% macro show_time(time) %}
     {{ moment(datetime.utcfromtimestamp(datetime.timestamp(time))).format('YYYY-MM-DD HH:mm:ss') }}

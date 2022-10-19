@@ -259,8 +259,8 @@ def logout_page():
 
 @auth.route("/user")
 def user_page():
-    user_id = request.args.get("user", -1, type=int)
-    if user_id == -1:
+    user_id = request.args.get("user", None, type=int)
+    if not user_id:
         return abort(404)
     elif current_user.is_authenticated and current_user.id == user_id:
         return redirect(url_for("auth.auth_page"))
@@ -298,8 +298,8 @@ def followed_page():
 
 @auth.route("/followed/follow")
 def set_follow_page():
-    user_id = request.args.get("user", 1, type=int)
-    if user_id == current_user.id:
+    user_id = request.args.get("user", None, type=int)
+    if not user_id or user_id == current_user.id:
         return abort(404)
 
     user = User.query.filter_by(id=user_id).first()
@@ -319,8 +319,8 @@ def set_follow_page():
 
 @auth.route("/followed/unfollow")
 def set_unfollow_page():
-    user_id = request.args.get("user", 1, type=int)
-    if user_id == current_user.id:
+    user_id = request.args.get("user", None, type=int)
+    if not user_id or user_id == current_user.id:
         return abort(404)
 
     user = User.query.filter_by(id=user_id).first()
@@ -335,8 +335,8 @@ def set_unfollow_page():
 
 @auth.route("/block")
 def set_block_page():
-    user_id = request.args.get("user", 1, type=int)
-    if user_id == current_user.id:
+    user_id = request.args.get("user", None, type=int)
+    if not user_id or user_id == current_user.id:
         return abort(404)
 
     user = User.query.filter_by(id=user_id).first()
