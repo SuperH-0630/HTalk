@@ -7,6 +7,7 @@ from flask_login import current_user, login_required
 
 from .db import db, Comment, Archive, User, Role
 from .login import role_required
+from .logger import Logger
 
 
 comment = Blueprint("comment", __name__)
@@ -35,7 +36,7 @@ class WriteCommentForm(FlaskForm):
 
 
 @comment.route("/")
-@role_required(Role.CHECK_COMMENT)
+@role_required(Role.CHECK_COMMENT, "check comment")
 def comment_page():
     comment_id = request.args.get("comment", None, type=int)
     if not comment_id:
@@ -43,6 +44,7 @@ def comment_page():
 
     cm: Comment = Comment.query.filter_by(id=comment_id).first()
     if cm:
+        Logger.print_load_page_log(f"comment {comment_id} page")
         return render_template("comment/comment.html",
                                comment=cm,
                                comment_son=cm.son)
@@ -50,7 +52,7 @@ def comment_page():
 
 
 @comment.route("/all")
-@role_required(Role.CHECK_COMMENT)
+@role_required(Role.CHECK_COMMENT, "list all comment")
 def list_all_page():
     page = request.args.get("page", 1, type=int)
     archive_id = request.args.get("archive", None, type=int)
@@ -60,6 +62,7 @@ def list_all_page():
                       .filter(Comment.title != None).filter(Comment.father_id == None)
                       .order_by(Comment.create_time.desc(), Comment.title.desc())
                       .paginate(page=page, per_page=8, error_out=False))
+        Logger.print_load_page_log("list all comment")
         return render_template("comment/list.html",
                                page=page,
                                archive=archive_id,
@@ -76,6 +79,7 @@ def list_all_page():
                       .filter(Comment.title != None).filter(Comment.father_id == None)
                       .order_by(Comment.create_time.desc(), Comment.title.asc())
                       .paginate(page=page, per_page=8, error_out=False))
+        Logger.print_load_page_log(f"list comment of archive {archive_id}")
         return render_template("comment/list.html",
                                page=page,
                                archive=archive_id,
@@ -87,7 +91,7 @@ def list_all_page():
 
 
 @comment.route("/user")
-@role_required(Role.CHECK_COMMENT)
+@role_required(Role.CHECK_COMMENT, "list user comment")
 def user_page():
     page = request.args.get("page", 1, type=int)
     user_id = request.args.get("user", None, type=int)
@@ -101,6 +105,7 @@ def user_page():
     pagination = (user.comment
                   .order_by(Comment.create_time.desc(), Comment.title.asc())
                   .paginate(page=page, per_page=8, error_out=False))
+    Logger.print_load_page_log(f"list comment of user {user_id}")
     return render_template("comment/user.html",
                            page=page,
                            user=user,
@@ -111,7 +116,7 @@ def user_page():
 
 @comment.route("/create", methods=["GET", "POST"])
 @login_required
-@role_required(Role.CREATE_COMMENT)
+@role_required(Role.CREATE_COMMENT, "create comment")
 def create_page():
     father_id = request.args.get("father", None, type=int)
 
@@ -135,5 +140,7 @@ def create_page():
         db.session.add(cm)
         db.session.commit()
         flash("讨论发表成功")
+        Logger.print_user_opt_success_log(f"create comment {cm.id}")
         return redirect(url_for("comment.comment_page", comment=cm.id))
+    Logger.print_load_page_log("create comment page")
     return render_template("comment/create.html", form=form, father=father)

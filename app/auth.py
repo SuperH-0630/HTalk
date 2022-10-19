@@ -111,6 +111,7 @@ def __load_login_page(passwd_login_form=None, email_login_form=None, register_fo
     if not register_form:
         register_form = RegisterForm()
 
+    Logger.print_load_page_log("user login")
     return render_template("auth/login.html",
                            passwd_login_form=passwd_login_form,
                            email_login_form=email_login_form,
@@ -130,7 +131,7 @@ def auth_page():
 @auth.route('/login/passwd', methods=["GET", "POST"])
 def passwd_login_page():
     if current_user.is_authenticated:  # 用户已经成功登陆
-        Logger.print_user_not_allow_opt_log("passwd-login.txt")
+        Logger.print_user_not_allow_opt_log("passwd-login")
         return redirect(url_for("auth.auth_page"))
 
     form = PasswdLoginForm()
@@ -142,10 +143,10 @@ def passwd_login_page():
             if next_page is None or not next_page.startswith('/'):
                 next_page = url_for('base.index_page')
             flash("登陆成功")
-            Logger.print_user_opt_success_log(f"passwd login.txt {form.email.data}")
+            Logger.print_user_opt_success_log(f"passwd login {form.email.data}")
             return redirect(next_page)
         flash("账号或密码错误")
-        Logger.print_user_opt_fail_log(f"passwd login.txt {form.email.data}")
+        Logger.print_user_opt_fail_log(f"passwd login {form.email.data}")
         return redirect(url_for("auth.passwd_login_page"))
     return __load_login_page(passwd_login_form=form, on_passwd_login=True)
 
@@ -153,7 +154,7 @@ def passwd_login_page():
 @auth.route('/login/email', methods=["GET", "POST"])
 def email_login_page():
     if current_user.is_authenticated:  # 用户已经成功登陆
-        Logger.print_user_not_allow_opt_log("email-login.txt")
+        Logger.print_user_not_allow_opt_log("email-login")
         return redirect(url_for("auth.auth_page"))
 
     form = EmailLoginForm()
@@ -164,10 +165,10 @@ def email_login_page():
             login_url = urljoin(request.host_url, url_for("auth.email_login_confirm_page", token=token))
             send_msg("登录确认", user.email, "login", login_url=login_url)
             flash("登录确认邮件已发送至邮箱")
-            Logger.print_user_opt_success_log(f"email login.txt {form.email.data}")
+            Logger.print_user_opt_success_log(f"email login {form.email.data}")
             return redirect(url_for("base.index_page"))
         flash("账号不存在")
-        Logger.print_user_opt_fail_log(f"email login.txt {form.email.data}")
+        Logger.print_user_opt_fail_log(f"email login {form.email.data}")
         return redirect(url_for("auth.passwd_login_page"))
     return __load_login_page(passwd_login_form=form, on_passwd_login=True)
 
@@ -175,7 +176,7 @@ def email_login_page():
 @auth.route('/register', methods=["GET", "POST"])
 def register_page():
     if current_user.is_authenticated:
-        Logger.print_user_not_allow_opt_log("register.txt")
+        Logger.print_user_not_allow_opt_log("register")
         return redirect(url_for("auth.auth_page"))
 
     form = RegisterForm()
@@ -184,7 +185,7 @@ def register_page():
         register_url = urljoin(request.host_url, url_for("auth.register_confirm_page", token=token))
         send_msg("注册确认", form.email.data, "register", register_url=register_url)
         flash("注册提交成功, 请进入邮箱点击确认注册链接")
-        Logger.print_import_user_opt_success_log(f"register.txt {form.email.data}")
+        Logger.print_import_user_opt_success_log(f"register {form.email.data}")
         return redirect(url_for("base.index_page"))
     return __load_login_page(register_form=form, on_register=True, on_passwd_login=False)
 
@@ -193,16 +194,16 @@ def register_page():
 def register_confirm_page():
     token = request.args.get("token", None)
     if token is None:
-        Logger.print_user_opt_fail_log(f"Confirm (bad token)")
+        Logger.print_user_opt_fail_log(f"register confirm (bad token)")
         return abort(404)
 
     token = User.register_load_token(token)
     if token is None:
-        Logger.print_user_opt_fail_log(f"Confirm (bad token)")
+        Logger.print_user_opt_fail_log(f"register confirm (bad token)")
         return abort(404)
 
     if User.query.filter_by(email=token[0]).first():
-        Logger.print_user_opt_fail_log(f"Confirm (bad token)")
+        Logger.print_user_opt_fail_log(f"register confirm (bad token)")
         return abort(404)
 
     if User.query.limit(1).first():  # 不是第一个用户
@@ -210,13 +211,13 @@ def register_confirm_page():
     else:
         admin = Role.query.filter_by(name="admin").first()
         if admin is None:
-            Logger.print_user_opt_fail_log(f"Role admin not found")
+            Logger.print_sys_opt_fail_log(f"get admin(role)")
             return abort(500)
         new_user = User(email=token[0], passwd_hash=User.get_passwd_hash(token[1]), role=admin)
     db.session.add(new_user)
     db.session.commit()
 
-    Logger.print_import_user_opt_success_log(f"confirm {token[0]} success")
+    Logger.print_user_opt_success_log(f"register confirm {token[0]}")
     flash(f"用户{token[0]}认证完成")
     return redirect(url_for("base.index_page"))
 
@@ -225,22 +226,22 @@ def register_confirm_page():
 def email_login_confirm_page():
     token = request.args.get("token", None)
     if token is None:
-        Logger.print_user_opt_fail_log(f"Confirm (bad token)")
+        Logger.print_user_opt_fail_log(f"login confirm (bad token)")
         return abort(404)
 
     token = User.login_load_token(token)
     if token is None:
-        Logger.print_user_opt_fail_log(f"Confirm (bad token)")
+        Logger.print_user_opt_fail_log(f"login confirm (bad token)")
         return abort(404)
 
     user = User.query.filter_by(email=token[0]).first()
     if not user:
-        Logger.print_user_opt_fail_log(f"Confirm (bad token)")
+        Logger.print_user_opt_fail_log(f"login confirm (bad token)")
         return abort(404)
 
     login_user(user, token[1])
     flash("登陆成功")
-    Logger.print_user_opt_success_log(f"passwd login.txt {user.email}")
+    Logger.print_user_opt_success_log(f"email login {user.email}")
     return redirect(url_for("base.index_page"))
 
 
@@ -268,9 +269,9 @@ def change_passwd_page():
 @auth.route('/logout')
 @login_required
 def logout_page():
-    Logger.print_import_user_opt_success_log(f"logout")
     logout_user()
     flash("退出登录成功")
+    Logger.print_user_opt_success_log(f"logout")
     return redirect(url_for("base.index_page"))
 
 
@@ -284,18 +285,20 @@ def user_page():
     user = User.query.filter_by(id=user_id).first()
     if not user:
         return abort(404)
+    Logger.print_load_page_log(f"user {user.email} page")
     return render_template("auth/user.html", user=user)
 
 
 @auth.route("/follower/list")
 @login_required
-@role_required(Role.CHECK_FOLLOW)
+@role_required(Role.CHECK_FOLLOW, "check follower")
 def follower_page():
     if current_user.follower_count == 0:
         return render_template("auth/no_follow.html", title="粉丝", msg="你暂时一个粉丝都没有哦。")
 
     page = request.args.get("page", 1, type=int)
     pagination = current_user.follower.paginate(page=page, per_page=8, error_out=False)
+    Logger.print_load_page_log(f"user {current_user.email} follower")
     return render_template("auth/follow.html",
                            items=[i.follower for i in pagination.items],
                            pagination=pagination,
@@ -304,13 +307,14 @@ def follower_page():
 
 @auth.route("/followed/list")
 @login_required
-@role_required(Role.CHECK_FOLLOW)
+@role_required(Role.CHECK_FOLLOW, "check followed")
 def followed_page():
     if current_user.followed_count == 0:
         return render_template("auth/no_follow.html", title="关注", msg="你暂时未关注任何人。")
 
     page = request.args.get("page", 1, type=int)
     pagination = current_user.followed.paginate(page=page, per_page=8, error_out=False)
+    Logger.print_load_page_log(f"user {current_user.email} followed")
     return render_template("auth/follow.html",
                            items=[i.followed for i in pagination.items],
                            pagination=pagination,
@@ -319,7 +323,7 @@ def followed_page():
 
 @auth.route("/followed/follow")
 @login_required
-@role_required(Role.FOLLOW)
+@role_required(Role.FOLLOW, "follow")
 def set_follow_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -342,7 +346,7 @@ def set_follow_page():
 
 @auth.route("/followed/unfollow")
 @login_required
-@role_required(Role.FOLLOW)
+@role_required(Role.FOLLOW, "unfollow")
 def set_unfollow_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -360,7 +364,7 @@ def set_unfollow_page():
 
 @auth.route("/block")
 @login_required
-@role_required(Role.BLOCK_USER)
+@role_required(Role.BLOCK_USER, "block user")
 def set_block_page():
     user_id = request.args.get("user", None, type=int)
     if not user_id or user_id == current_user.id:
@@ -372,6 +376,7 @@ def set_block_page():
 
     block = Role.query.filter_by(name="block").first()
     if not block:
+        Logger.print_sys_opt_fail_log("get block(role)")
         return abort(500)
 
     user.role = block
@@ -382,7 +387,7 @@ def set_block_page():
 
 @auth.route('/role/user', methods=['GET', 'POST'])
 @login_required
-@role_required(Role.SYSTEM)
+@role_required(Role.SYSTEM, "change user role")
 def change_role_page():
     form = ChangeRoleForm()
     if form.validate_on_submit():
@@ -399,5 +404,7 @@ def change_role_page():
         user.role = role
         db.session.commit()
         flash("用户分组修改成功")
+        Logger.print_sys_opt_success_log(f"move {user.email} to {role.name}")
         return redirect(url_for("auth.change_role_page"))
+    Logger.print_load_page_log("change user role")
     return render_template("auth/change_role.html", form=form)

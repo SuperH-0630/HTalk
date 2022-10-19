@@ -1,7 +1,9 @@
 from functools import wraps
 from flask import abort
 from flask_login import LoginManager, current_user
+
 from .db import AnonymousUser, User, Role
+from .logger import  Logger
 
 
 login = LoginManager()
@@ -19,11 +21,12 @@ def user_loader(user_id: int):
     return None
 
 
-def role_required(role: int):
+def role_required(role: int, opt: str):
     def required(func):
         @wraps(func)
         def new_func(*args, **kwargs):
             if not current_user.role.has_permission(role):  # 检查相应的权限
+                Logger.print_user_not_allow_opt_log(opt)
                 return abort(403)
             return func(*args, **kwargs)
         return new_func
