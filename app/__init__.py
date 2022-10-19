@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, Response
 from flask.logging import default_handler
 import logging
 import logging.handlers
@@ -11,6 +11,7 @@ from .moment import moment
 from .mail import mail
 from .migrate import migrate
 from .login import login
+from .logger import Logger
 
 from configure import conf
 
@@ -40,6 +41,8 @@ class HTalkFlask(Flask):
                     "Role": Role,
                     "User": User,
                     "datetime": datetime}
+
+        self.error_page([400, 401, 403, 404, 405, 408, 410, 413, 414, 423, 500, 501, 502])
 
     def blueprint(self):
         from .index import index
@@ -77,4 +80,15 @@ class HTalkFlask(Flask):
     def update_configure(self):
         """ 更新配置 """
         self.config.update(conf)
+
+    def error_page(self, error_code):
+        for i in error_code:
+            def create_error_handle(status):  # 创建一个 status 变量给 error_handle
+                def error_handle(e):
+                    Logger.print_load_page_log(status)
+                    data = render_template('error.html', error_code=status, error_info=e)
+                    return Response(response=data, status=status)
+                return error_handle
+
+            self.errorhandler(i)(create_error_handle(i))
 
