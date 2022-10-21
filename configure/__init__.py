@@ -14,7 +14,7 @@ conf: Dict[str, any] = {
                   "%(process)d %(thread)d "
                   "%(message)s",
 
-    "SECRET_KEY": "11111111",
+    "SECRET_KEY": "HTalk-R-Salt",
     "SQLALCHEMY_DATABASE_URI": "mysql+pymysql://root:12345678@localhost:3306/htalk",
     "SQLALCHEMY_TRACK_MODIFICATIONS": False,
     "LOGO": "icon.svg",
