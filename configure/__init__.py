@@ -7,7 +7,7 @@ from typing import Dict
 conf: Dict[str, any] = {
     "DEBUG_PROFILE": False,
     "LOG_STDERR": True,
-    "LOG_LEVEL": "info",
+    "LOG_LEVEL": logging.INFO,
     "LOG_HOME": "",
     "LOG_FORMAT": "[%(levelname)s]:%(name)s:%(asctime)s "
                   "(%(filename)s:%(lineno)d %(funcName)s) "
