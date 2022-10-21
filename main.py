@@ -4,13 +4,13 @@ import os
 import logging
 
 env_dict = os.environ
-htlak_conf = env_dict.get("HTALK_CONF")
-if htlak_conf is None:
+htalk_conf = env_dict.get("HTALK_CONF")
+if htalk_conf is None:
     logging.info("Configure file ./etc/conf.json")
     configure("./etc/conf.json")
 else:
-    logging.info(f"Configure file {htlak_conf}")
-    configure(htlak_conf)
+    logging.info(f"Configure file {htalk_conf}")
+    configure(htalk_conf)
 
 
 from app import HTalkFlask
