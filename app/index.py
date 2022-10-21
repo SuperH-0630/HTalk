@@ -1,6 +1,5 @@
 from flask import Blueprint, redirect, url_for, request
 
-from .db import Comment
 
 
 index = Blueprint("base", __name__)
